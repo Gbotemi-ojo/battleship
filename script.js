@@ -24,46 +24,32 @@ class ship {
     }
 }
 class gameBoard {
-    constructor() {
-        this.coordinateGeneratorX = this.coordinateGeneratorX();
-        this.coordinateGeneratorY = this.coordinateGeneratorY();
-    }
-    coordinateGeneratorX() {
-        let coordinateArray = []
-        let columns = ['a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j'];
-        let rows = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10];
-        for (let i = 0; i <= columns.length - 1; i++) {
-            for (let j = 0; j <= rows.length - 1; j++) {
-                coordinateArray.push(rows[i] + columns[j]);
-            }
-        }
-        return coordinateArray;
-    }
-    coordinateGeneratorY() {
-        let coordinateArray = []
-        let columns = ['a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j'];
-        let rows = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10];
-        for (let i = 0; i <= columns.length - 1; i++) {
-            for (let j = 0; j <= rows.length - 1; j++) {
-                coordinateArray.push(rows[j] + columns[i]);
-            }
-        }
-        return coordinateArray;
-    }
-    getShips(){
+    getShips() {
         let ships = []
         let cruiser = new ship(2);
         let submarine = new ship(3);
         let destroyer = new ship(3);
         let battleship = new ship(4);
         let carrier = new ship(5);
-        ships.push(cruiser,submarine,destroyer,battleship,carrier);
+        ships.push(cruiser, submarine, destroyer, battleship, carrier);
         return ships;
     }
+    recieveAttacks() {
+
+    }
 }
+let gameBoardArray = [];
+let size = 0;
+let currentAxis = 'X';
+let invalidPositionsArray = [];
+let gameStarted = false;
+let selectedShip = true;
+let placedShip = false;
+let shipPlaceMentCount = 0
 let Board = new gameBoard();
 let ships = Board.getShips();
-console.log(Board.getShips()[0]);
+let computerShips = Board.getShips();
+let shipCount = 0;
 
 let selectCruiser = document.querySelector('.cruiser');
 let selectSubmarine = document.querySelector('.submarine');
@@ -72,7 +58,36 @@ let selectBattleship = document.querySelector('.battleship');
 let selectCarrier = document.querySelector('.carrier');
 let gameBox = document.querySelectorAll('.gameBox');
 let rotateBtn = document.querySelector('.rotate');
-let hoverBoards = document.querySelectorAll('.hoverBoard')
+let hoverBoards = document.querySelectorAll('.hoverBoard');
+let exitBtn = document.querySelector('.exit');
+let infoCard = document.querySelector('.infoCard');
+function disableClicksOnShips() {
+    if (selectedShip === true) {
+        selectCruiser.style.pointerEvents = 'none';
+        selectSubmarine.style.pointerEvents = 'none';
+        selectDestroyer.style.pointerEvents = 'none';
+        selectBattleship.style.pointerEvents = 'none';
+        selectCarrier.style.pointerEvents = 'none';
+    }
+    else {
+        return
+    }
+}
+function enableClicksOnShips() {
+    if (selectedShip === false) {
+        selectCruiser.style.pointerEvents = 'all';
+        selectSubmarine.style.pointerEvents = 'all';
+        selectDestroyer.style.pointerEvents = 'all';
+        selectBattleship.style.pointerEvents = 'all';
+        selectCarrier.style.pointerEvents = 'all';
+    }
+    else {
+        return
+    }
+}
+exitBtn.addEventListener('click', () => {
+    infoCard.remove()
+})
 
 function coordinateGeneratorX() {
     let coordinateArray = []
@@ -97,13 +112,9 @@ function coordinateGeneratorY() {
     return coordinateArray;
 }
 
-let gameBoardArray = [];
-let size = 3;
-let currentAxis = 'X';
-let invalidPositionsArray = [];
 function updateInvalidPositionArraay() {
-    let invalidEnteriesx = invalidEnteriesX();
-    let invalidEnteriesy = invalidEnteriesY();
+    let invalidEnteriesx = invalidEnteriesX(setShipX(size, targetCoordinates));
+    let invalidEnteriesy = invalidEnteriesY(setShipY(size, targetCoordinates));
     if (currentAxis === 'X') {
         for (let i = 0; i <= invalidEnteriesx.length - 1; i++) {
             invalidPositionsArray.push(invalidEnteriesx[i]);
@@ -120,31 +131,35 @@ gameBox.forEach(element => {
     element.addEventListener('click', () => {
         if (currentAxis === 'X') {
             targetCoordinates = element.getAttribute('id');
-            let enteriesX = setShipX(size);
+            let enteriesX = setShipX(size, targetCoordinates);
             if (invalidPositionsArray.some(x => enteriesX.includes(x))) {
                 console.log('hjk');
                 return;
             }
             updateInvalidPositionArraay();
             if (currentAxis === 'X') {
-                designShipX(size);
+                designShipX(size, targetCoordinates);
                 size = 0;
             }
         }
+        enableClicksOnShips();
     })
 });
 gameBox.forEach(element => {
     element.addEventListener('click', () => {
+        selectedShip = false;
+        alerting();
+        enableClicksOnShips();
         if (currentAxis === 'Y') {
             targetCoordinates = element.getAttribute('id');
-            let enteriesY = setShipY(size)
+            let enteriesY = setShipY(size, targetCoordinates)
             if (invalidPositionsArray.some(y => enteriesY.includes(y))) {
                 console.log('hjk');
                 return;
             }
             updateInvalidPositionArraay();
             if (currentAxis === 'Y') {
-                designShipY(size);
+                designShipY(size, targetCoordinates);
                 size = 0;
             }
         }
@@ -153,13 +168,12 @@ gameBox.forEach(element => {
         }
     })
 });
-function invalidEnteriesX() {
+function invalidEnteriesX(currentCoordinates) {
     if (currentAxis === 'X') {
         let invalidPositions = [];
         let coordinateArray = coordinateGeneratorX();
-        let currentCoordinates = setShipX(size);
         let head = currentCoordinates[0];
-        let tail = currentCoordinates[currentCoordinates.length - 1]
+        let tail = currentCoordinates[currentCoordinates.length - 1];
         let headIndex = coordinateArray.indexOf(head);
         let tailIndex = coordinateArray.indexOf(tail);
         for (let i = 0; i <= currentCoordinates.length - 1; i++) {
@@ -201,18 +215,17 @@ function invalidEnteriesX() {
         return;
     }
 }
-function invalidEnteriesY() {
+function invalidEnteriesY(currentCoordinates) {
     if (currentAxis === 'Y') {
         let invalidPositions = [];
         let coordinateArray = coordinateGeneratorY();
-        let currentCoordinates = setShipY(size);
         let head = currentCoordinates[0];
         let tail = currentCoordinates[currentCoordinates.length - 1]
         let headIndex = coordinateArray.indexOf(head);
         let tailIndex = coordinateArray.indexOf(tail);
         for (let i = 0; i <= currentCoordinates.length - 1; i++) {
             let currentIndex = coordinateArray.indexOf(currentCoordinates[i]);
-            invalidPositions.push(currentCoordinates[i])
+            invalidPositions.push(currentCoordinates[i]);
             if (head.includes('1')) {
                 invalidPositions.push(coordinateArray[currentIndex - 10]);
                 invalidPositions.push(coordinateArray[currentIndex + 10]);
@@ -250,7 +263,7 @@ function invalidEnteriesY() {
     }
 }
 
-function setShipX(size) {
+function setShipX(size, targetCoordinates) {
     let gameBoardCoordinates = coordinateGeneratorX();
     let coordinateArray = [];
     if (currentAxis === 'X') {
@@ -258,7 +271,7 @@ function setShipX(size) {
         for (let i = head; i < (head + size); i++) {
             coordinateArray.push(gameBoardCoordinates[i]);
         }
-        console.log(coordinateArray)
+        console.log(coordinateArray);
         let coordinateHead = coordinateArray[0];
         let coordinateTail = coordinateArray[coordinateArray.length - 1];
         if (coordinateHead.slice(0, 1) === coordinateTail.slice(0, 1)) {
@@ -269,10 +282,11 @@ function setShipX(size) {
         }
     }
     else {
-        return;
+        return 'not po';
     }
 }
-function setShipY(size) {
+
+function setShipY(size, targetCoordinates) {
     let coordinateArray = [];
     if (currentAxis === 'Y') {
         let gameBoardCoordinates = coordinateGeneratorY();
@@ -293,9 +307,9 @@ function setShipY(size) {
     }
 }
 
-function designShipX(size) {
+function designShipX(size, targetCoordinates) {
     if (currentAxis === 'X') {
-        let requiredCoordinates = setShipX(size);
+        let requiredCoordinates = setShipX(size, targetCoordinates);
         for (let i = 0; i <= requiredCoordinates.length; i++) {
             let element = document.getElementById(requiredCoordinates[i]);
             if (element !== null) {
@@ -305,9 +319,9 @@ function designShipX(size) {
     }
 }
 
-function designShipY(size) {
+function designShipY(size, targetCoordinates) {
     if (currentAxis === 'Y') {
-        let requiredCoordinates = setShipY(size);
+        let requiredCoordinates = setShipY(size, targetCoordinates);
         for (let i = 0; i <= requiredCoordinates.length; i++) {
             let element = document.getElementById(requiredCoordinates[i]);
             if (element !== null) {
@@ -317,25 +331,90 @@ function designShipY(size) {
     }
 }
 selectCruiser.addEventListener('click', () => {
+    selectedShip = true;
+    disableClicksOnShips();
+    selectedShip = true;
+    shipCount++
     size = 2;
     selectCruiser.classList.add('reduce')
+    if (currentAxis === 'X') {
+        ships[0].takenCoordinates.push(setShipX(size, targetCoordinates));
+        computerShips[0].takenCoordinates.push(getComputerChoicesX(size));
+    }
+    else {
+        ships[0].takenCoordinates.push(setShipY(size, targetCoordinates));
+        computerShips[0].takenCoordinates.push(getComputerChoicesY(size));
+    }
 })
 selectSubmarine.addEventListener('click', () => {
+    selectedShip = true;
+    disableClicksOnShips();
+    selectedShip = true;
+    shipCount++
     size = 3;
     selectSubmarine.classList.add('reduce')
+    if (currentAxis === 'X') {
+        ships[1].takenCoordinates.push(setShipX(size, targetCoordinates));
+        computerShips[1].takenCoordinates.push(getComputerChoicesX(size));
+    }
+    else {
+        ships[1].takenCoordinates.push(setShipY(size, targetCoordinates));
+        computerShips[1].takenCoordinates.push(getComputerChoicesY(size));
+    }
 })
 selectDestroyer.addEventListener('click', () => {
+    selectedShip = true;
+    disableClicksOnShips();
+    selectedShip = true;
     size = 3;
+    shipCount++
     selectDestroyer.classList.add('reduce')
+    if (currentAxis === 'X') {
+        ships[2].takenCoordinates.push(setShipX(size, targetCoordinates));
+        computerShips[2].takenCoordinates.push(getComputerChoicesX(size));
+    }
+    else {
+        ships[2].takenCoordinates.push(setShipY(size, targetCoordinates));
+        computerShips[2].takenCoordinates.push(getComputerChoicesY(size));
+    }
 })
 selectBattleship.addEventListener('click', () => {
+    selectedShip = true;
+    disableClicksOnShips();
+    selectedShip = true;
     size = 4;
+    shipCount++
     selectBattleship.classList.add('reduce')
+    if (currentAxis === 'X') {
+        ships[3].takenCoordinates.push(setShipX(size, targetCoordinates));
+        computerShips[3].takenCoordinates.push(getComputerChoicesX(size));
+    }
+    else {
+        ships[3].takenCoordinates.push(setShipY(size, targetCoordinates));
+        computerShips[3].takenCoordinates.push(getComputerChoicesY(size));
+    }
 })
 selectCarrier.addEventListener('click', () => {
+    selectedShip = true;
+    disableClicksOnShips();
+    selectedShip = true;
     size = 5;
+    shipCount++
     selectCarrier.classList.add('reduce')
+    if (currentAxis === 'X') {
+        computerShips[4].takenCoordinates.push(getComputerChoicesX(size));
+        ships[4].takenCoordinates.push(setShipX(size, targetCoordinates));
+    }
+    else {
+        computerShips[4].takenCoordinates.push(getComputerChoicesY(size));
+        ships[4].takenCoordinates.push(setShipY(size, targetCoordinates));
+    }
 })
+function alerting() {
+    if (shipCount === 5 && selectedShip === false) {
+        alert('yellow')
+    }
+}
 rotateBtn.addEventListener('click', () => {
     if (currentAxis === 'X') {
         currentAxis = 'Y';
@@ -370,7 +449,7 @@ gameBox.forEach(element => {
 });
 function hoverX() {
     if (currentAxis === 'X') {
-        let requiredCoordinates = setShipX(size);
+        let requiredCoordinates = setShipX(size, targetCoordinates);
         for (let i = 0; i <= requiredCoordinates.length; i++) {
             let element = document.getElementById(requiredCoordinates[i]);
             if (element !== null) {
@@ -384,7 +463,7 @@ function hoverX() {
 }
 function removeHoverX() {
     if (currentAxis === 'X') {
-        let coordinate = setShipX(size);
+        let coordinate = setShipX(size, targetCoordinates);
         for (let i = 0; i <= coordinate.length - 1; i++) {
             let elem = document.getElementById(coordinate[i])
             elem.classList.remove('hover');
@@ -426,4 +505,53 @@ const setCoordinates = (function () {
         gameBox[i].setAttribute('id', coordinate[i]);
     }
 })();
-
+let invalidComputerPositionsArray = [];
+function updateInvalidComputerPositionArray(arr){
+    for (let i = 0; i <= arr.length - 1; i++) {
+        invalidComputerPositionsArray.push(arr[i]);
+    }
+}
+function getComputerChoicesX(size) {
+    let chosenCoordinates = [];
+    let coordinate1 = coordinateGeneratorX();
+    while (chosenCoordinates.length < size) {
+        let randomNumber = Math.floor(Math.random() * 100);
+        let targetCoordinates = coordinate1[randomNumber];
+        let setX = setShipX(size, targetCoordinates);
+        console.log(setX);
+        for (let i = 0; i <= setX.length - 1; i++) {
+            chosenCoordinates.push(setX[i]);
+        }
+        if (chosenCoordinates[0] === 'n' || setX[0] === undefined || invalidComputerPositionsArray.some(x => setX.includes(x))){
+            chosenCoordinates = [];
+            console.log('tried again');
+        }
+        else{
+        let arr = invalidEnteriesX(chosenCoordinates);
+        updateInvalidComputerPositionArray(arr);
+        }
+    }
+    return chosenCoordinates;
+}
+function getComputerChoicesY(size) {
+    let chosenCoordinates = [];
+    let coordinate1 = coordinateGeneratorY();
+    while (chosenCoordinates.length < size) {
+        let randomNumber = Math.floor(Math.random() * 100);
+        let targetCoordinates = coordinate1[randomNumber];
+        let setY = setShipY(size, targetCoordinates);
+        console.log(setY);
+        for (let i = 0; i <= setY.length - 1; i++) {
+            chosenCoordinates.push(setY[i]);
+        }
+        if (chosenCoordinates[0] === 'n' || setY[0] === undefined || invalidComputerPositionsArray.some(y => setY.includes(y))) {
+            chosenCoordinates = [];
+            console.log('tried again');
+        }
+        else {
+            let arr = invalidEnteriesY(chosenCoordinates);
+            updateInvalidComputerPositionArray(arr);
+        }
+    }
+    return chosenCoordinates;
+}
