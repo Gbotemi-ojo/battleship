@@ -25,7 +25,7 @@ class ship {
 }
 class gameBoard {
     getShips() {
-        let ships = []
+        let ships = [];
         let cruiser = new ship(2);
         let submarine = new ship(3);
         let destroyer = new ship(3);
@@ -45,12 +45,16 @@ let invalidPositionsArray = [];
 let gameStarted = false;
 let selectedShip = true;
 let placedShip = false;
-let shipPlaceMentCount = 0
+let shipPlaceMentCount = 0;
 let Board = new gameBoard();
 let ships = Board.getShips();
 let computerShips = Board.getShips();
 let shipCount = 0;
+let shipIndex = null;
 
+let shipyardContainer = document.querySelector('.shipyardContainer');
+let startGameBtn = document.querySelector('.startGameBtn');
+let gameStartedContainer = document.querySelector('.gameStartedContainer');
 let selectCruiser = document.querySelector('.cruiser');
 let selectSubmarine = document.querySelector('.submarine');
 let selectDestroyer = document.querySelector('.destroyer');
@@ -90,7 +94,7 @@ exitBtn.addEventListener('click', () => {
 })
 
 function coordinateGeneratorX() {
-    let coordinateArray = []
+    let coordinateArray = [];
     let columns = ['a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j'];
     let rows = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10];
     for (let i = 0; i <= columns.length - 1; i++) {
@@ -132,32 +136,33 @@ gameBox.forEach(element => {
         if (currentAxis === 'X') {
             targetCoordinates = element.getAttribute('id');
             let enteriesX = setShipX(size, targetCoordinates);
-            if (invalidPositionsArray.some(x => enteriesX.includes(x))) {
-                console.log('hjk');
-                return;
-            }
+            if(enteriesX[0] === 'n') return;
+            if (invalidPositionsArray.some(x => enteriesX.includes(x))) return;
             updateInvalidPositionArraay();
+            selectedShip = false;
+            alerting();
+            ships[shipIndex].takenCoordinates.push(setShipX(size, targetCoordinates));
             if (currentAxis === 'X') {
                 designShipX(size, targetCoordinates);
                 size = 0;
             }
         }
         enableClicksOnShips();
+        element.click();
     })
 });
 gameBox.forEach(element => {
     element.addEventListener('click', () => {
-        selectedShip = false;
-        alerting();
         enableClicksOnShips();
         if (currentAxis === 'Y') {
             targetCoordinates = element.getAttribute('id');
-            let enteriesY = setShipY(size, targetCoordinates)
-            if (invalidPositionsArray.some(y => enteriesY.includes(y))) {
-                console.log('hjk');
-                return;
-            }
+            let enteriesY = setShipY(size, targetCoordinates);
+            if(enteriesY[0] === 'n') return;
+            if (invalidPositionsArray.some(y => enteriesY.includes(y))) return;
             updateInvalidPositionArraay();
+            selectedShip = false;
+            alerting();
+            ships[shipIndex].takenCoordinates.push(setShipY(size, targetCoordinates));
             if (currentAxis === 'Y') {
                 designShipY(size, targetCoordinates);
                 size = 0;
@@ -271,7 +276,6 @@ function setShipX(size, targetCoordinates) {
         for (let i = head; i < (head + size); i++) {
             coordinateArray.push(gameBoardCoordinates[i]);
         }
-        console.log(coordinateArray);
         let coordinateHead = coordinateArray[0];
         let coordinateTail = coordinateArray[coordinateArray.length - 1];
         if (coordinateHead.slice(0, 1) === coordinateTail.slice(0, 1)) {
@@ -297,7 +301,6 @@ function setShipY(size, targetCoordinates) {
         let coordinateHead = coordinateArray[0];
         let coordinateTail = coordinateArray[coordinateArray.length - 1];
         if (coordinateHead.slice(coordinateHead.length - 1) === coordinateTail.slice(coordinateTail.length - 1)) {
-            console.log(coordinateArray);
             return coordinateArray;
         }
         else return 'not possible';
@@ -336,13 +339,12 @@ selectCruiser.addEventListener('click', () => {
     selectedShip = true;
     shipCount++
     size = 2;
+    shipIndex = 0;
     selectCruiser.classList.add('reduce')
     if (currentAxis === 'X') {
-        ships[0].takenCoordinates.push(setShipX(size, targetCoordinates));
         computerShips[0].takenCoordinates.push(getComputerChoicesX(size));
     }
     else {
-        ships[0].takenCoordinates.push(setShipY(size, targetCoordinates));
         computerShips[0].takenCoordinates.push(getComputerChoicesY(size));
     }
 })
@@ -352,13 +354,12 @@ selectSubmarine.addEventListener('click', () => {
     selectedShip = true;
     shipCount++
     size = 3;
+    shipIndex = 1
     selectSubmarine.classList.add('reduce')
     if (currentAxis === 'X') {
-        ships[1].takenCoordinates.push(setShipX(size, targetCoordinates));
         computerShips[1].takenCoordinates.push(getComputerChoicesX(size));
     }
     else {
-        ships[1].takenCoordinates.push(setShipY(size, targetCoordinates));
         computerShips[1].takenCoordinates.push(getComputerChoicesY(size));
     }
 })
@@ -367,14 +368,13 @@ selectDestroyer.addEventListener('click', () => {
     disableClicksOnShips();
     selectedShip = true;
     size = 3;
+    shipIndex = 2
     shipCount++
     selectDestroyer.classList.add('reduce')
     if (currentAxis === 'X') {
-        ships[2].takenCoordinates.push(setShipX(size, targetCoordinates));
         computerShips[2].takenCoordinates.push(getComputerChoicesX(size));
     }
     else {
-        ships[2].takenCoordinates.push(setShipY(size, targetCoordinates));
         computerShips[2].takenCoordinates.push(getComputerChoicesY(size));
     }
 })
@@ -383,14 +383,13 @@ selectBattleship.addEventListener('click', () => {
     disableClicksOnShips();
     selectedShip = true;
     size = 4;
+    shipIndex = 3
     shipCount++
     selectBattleship.classList.add('reduce')
     if (currentAxis === 'X') {
-        ships[3].takenCoordinates.push(setShipX(size, targetCoordinates));
         computerShips[3].takenCoordinates.push(getComputerChoicesX(size));
     }
     else {
-        ships[3].takenCoordinates.push(setShipY(size, targetCoordinates));
         computerShips[3].takenCoordinates.push(getComputerChoicesY(size));
     }
 })
@@ -399,15 +398,14 @@ selectCarrier.addEventListener('click', () => {
     disableClicksOnShips();
     selectedShip = true;
     size = 5;
+    shipIndex = 4
     shipCount++
-    selectCarrier.classList.add('reduce')
+    selectCarrier.classList.add('reduce');
     if (currentAxis === 'X') {
         computerShips[4].takenCoordinates.push(getComputerChoicesX(size));
-        ships[4].takenCoordinates.push(setShipX(size, targetCoordinates));
     }
     else {
         computerShips[4].takenCoordinates.push(getComputerChoicesY(size));
-        ships[4].takenCoordinates.push(setShipY(size, targetCoordinates));
     }
 })
 function alerting() {
@@ -424,28 +422,16 @@ rotateBtn.addEventListener('click', () => {
     }
 })
 gameBox.forEach(element => {
-    if (currentAxis === 'X') {
-        element.addEventListener('mouseenter', () => {
-            targetCoordinates = element.getAttribute('id');
-            hoverX();
-        })
-        element.addEventListener('mouseleave', () => {
-            targetCoordinates = element.getAttribute('id');
-            removeHoverX();
-        })
-    }
-});
-gameBox.forEach(element => {
-    if (currentAxis === 'Y') {
-        element.addEventListener('mouseenter', () => {
-            targetCoordinates = element.getAttribute('id');
-            hoverY();
-        })
-        element.addEventListener('mouseleave', () => {
-            targetCoordinates = element.getAttribute('id');
-            removeHoverY()
-        })
-    }
+    // if (currentAxis === 'X') {
+    element.addEventListener('mouseenter', () => {
+        targetCoordinates = element.getAttribute('id');
+        hoverX();
+    })
+    element.addEventListener('mouseleave', () => {
+        targetCoordinates = element.getAttribute('id');
+        removeHoverX();
+    })
+    // }
 });
 function hoverX() {
     if (currentAxis === 'X') {
@@ -457,8 +443,14 @@ function hoverX() {
             }
         }
     }
-    else {
-        return
+    else if (currentAxis === 'Y') {
+        let requiredCoordinates = setShipY(size, targetCoordinates);
+        for (let i = 0; i <= requiredCoordinates.length; i++) {
+            let element = document.getElementById(requiredCoordinates[i]);
+            if (element !== null) {
+                element.classList.add('hover2');
+            }
+        }
     }
 }
 function removeHoverX() {
@@ -469,34 +461,12 @@ function removeHoverX() {
             elem.classList.remove('hover');
         }
     }
-    else {
-        return;
-    }
-}
-function hoverY() {
-    if (currentAxis === 'Y') {
-        let requiredCoordinates = setShipY(size);
-        for (let i = 0; i <= requiredCoordinates.length; i++) {
-            let element = document.getElementById(requiredCoordinates[i]);
-            if (element !== null) {
-                element.classList.add('hover2');
-            }
-        }
-    }
-    else {
-        return
-    }
-}
-function removeHoverY() {
-    if (currentAxis === 'Y') {
-        let coordinate = setShipY(size);
+    else if (currentAxis === 'Y') {
+        let coordinate = setShipY(size, targetCoordinates);
         for (let i = 0; i <= coordinate.length - 1; i++) {
             let elem = document.getElementById(coordinate[i])
             elem.classList.remove('hover2');
         }
-    }
-    else {
-        return;
     }
 }
 const setCoordinates = (function () {
@@ -506,7 +476,7 @@ const setCoordinates = (function () {
     }
 })();
 let invalidComputerPositionsArray = [];
-function updateInvalidComputerPositionArray(arr){
+function updateInvalidComputerPositionArray(arr) {
     for (let i = 0; i <= arr.length - 1; i++) {
         invalidComputerPositionsArray.push(arr[i]);
     }
@@ -522,13 +492,14 @@ function getComputerChoicesX(size) {
         for (let i = 0; i <= setX.length - 1; i++) {
             chosenCoordinates.push(setX[i]);
         }
-        if (chosenCoordinates[0] === 'n' || setX[0] === undefined || invalidComputerPositionsArray.some(x => setX.includes(x))){
+        if (chosenCoordinates[0] === 'n' || setX[0] === undefined || invalidComputerPositionsArray.some(x => setX.includes(x))) {
             chosenCoordinates = [];
             console.log('tried again');
         }
-        else{
-        let arr = invalidEnteriesX(chosenCoordinates);
-        updateInvalidComputerPositionArray(arr);
+        else {
+            let arr = invalidEnteriesX(chosenCoordinates);
+            updateInvalidComputerPositionArray(arr);
+            console.log(size);
         }
     }
     return chosenCoordinates;
@@ -551,7 +522,10 @@ function getComputerChoicesY(size) {
         else {
             let arr = invalidEnteriesY(chosenCoordinates);
             updateInvalidComputerPositionArray(arr);
+            console.log(size);
         }
     }
     return chosenCoordinates;
 }
+
+
