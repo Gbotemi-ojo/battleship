@@ -38,7 +38,9 @@ class gameBoard {
 
     }
 }
-let gameBoardArray = [];
+let playerChosenCoordinate = [];
+let computerChosenCoordinate = [];
+
 let size = 0;
 let currentAxis = 'X';
 let invalidPositionsArray = [];
@@ -130,15 +132,37 @@ function updateInvalidPositionArraay() {
         }
     }
 }
+function updatePlayerChosenCoordinateArray() {
+    let arr1 = (setShipX(size, targetCoordinates));
+    let arr2 = (setShipY(size, targetCoordinates));
+    if (currentAxis === 'X') {
+        for (let i = 0; i <= arr1.length - 1; i++) {
+            playerChosenCoordinate.push(arr1[i])
+        }
+    }
+    else {
+        for (let i = 0; i <= arr2.length - 1; i++) {
+            playerChosenCoordinate.push(arr2[i])
+        }
+    }
+}
+function updateComputerChosenCoordinateArrayX(shipIndex) {
+    let arr1 = computerShips[shipIndex].takenCoordinates[0]
+    for (let i = 0; i <= arr1.length - 1; i++) {
+        computerChosenCoordinate.push(arr1[i])
+    }
+}
 let targetCoordinates = '';
 gameBox.forEach(element => {
     element.addEventListener('click', () => {
         if (currentAxis === 'X') {
             targetCoordinates = element.getAttribute('id');
             let enteriesX = setShipX(size, targetCoordinates);
-            if(enteriesX[0] === 'n') return;
+            if (enteriesX[0] === 'n') return;
             if (invalidPositionsArray.some(x => enteriesX.includes(x))) return;
             updateInvalidPositionArraay();
+            updatePlayerChosenCoordinateArray();
+            // playerChosenCoordinate.push(setShipX(size, targetCoordinates));
             selectedShip = false;
             alerting();
             ships[shipIndex].takenCoordinates.push(setShipX(size, targetCoordinates));
@@ -157,9 +181,10 @@ gameBox.forEach(element => {
         if (currentAxis === 'Y') {
             targetCoordinates = element.getAttribute('id');
             let enteriesY = setShipY(size, targetCoordinates);
-            if(enteriesY[0] === 'n') return;
+            if (enteriesY[0] === 'n') return;
             if (invalidPositionsArray.some(y => enteriesY.includes(y))) return;
             updateInvalidPositionArraay();
+            updatePlayerChosenCoordinateArray();
             selectedShip = false;
             alerting();
             ships[shipIndex].takenCoordinates.push(setShipY(size, targetCoordinates));
@@ -286,7 +311,7 @@ function setShipX(size, targetCoordinates) {
         }
     }
     else {
-        return 'not po';
+        return 'not possible';
     }
 }
 
@@ -316,7 +341,7 @@ function designShipX(size, targetCoordinates) {
         for (let i = 0; i <= requiredCoordinates.length; i++) {
             let element = document.getElementById(requiredCoordinates[i]);
             if (element !== null) {
-                element.style.background = 'red';
+                element.classList.add('redShip');
             }
         }
     }
@@ -328,7 +353,7 @@ function designShipY(size, targetCoordinates) {
         for (let i = 0; i <= requiredCoordinates.length; i++) {
             let element = document.getElementById(requiredCoordinates[i]);
             if (element !== null) {
-                element.style.background = 'red';
+                element.classList.add('redShip');
             }
         }
     }
@@ -347,6 +372,7 @@ selectCruiser.addEventListener('click', () => {
     else {
         computerShips[0].takenCoordinates.push(getComputerChoicesY(size));
     }
+    updateComputerChosenCoordinateArrayX(shipIndex)
 })
 selectSubmarine.addEventListener('click', () => {
     selectedShip = true;
@@ -362,6 +388,7 @@ selectSubmarine.addEventListener('click', () => {
     else {
         computerShips[1].takenCoordinates.push(getComputerChoicesY(size));
     }
+    updateComputerChosenCoordinateArrayX(shipIndex)
 })
 selectDestroyer.addEventListener('click', () => {
     selectedShip = true;
@@ -377,6 +404,7 @@ selectDestroyer.addEventListener('click', () => {
     else {
         computerShips[2].takenCoordinates.push(getComputerChoicesY(size));
     }
+    updateComputerChosenCoordinateArrayX(shipIndex)
 })
 selectBattleship.addEventListener('click', () => {
     selectedShip = true;
@@ -392,6 +420,7 @@ selectBattleship.addEventListener('click', () => {
     else {
         computerShips[3].takenCoordinates.push(getComputerChoicesY(size));
     }
+    updateComputerChosenCoordinateArrayX(shipIndex)
 })
 selectCarrier.addEventListener('click', () => {
     selectedShip = true;
@@ -403,14 +432,17 @@ selectCarrier.addEventListener('click', () => {
     selectCarrier.classList.add('reduce');
     if (currentAxis === 'X') {
         computerShips[4].takenCoordinates.push(getComputerChoicesX(size));
+        // updateComputerChosenCoordinateArrayX(shipIndex)
     }
     else {
         computerShips[4].takenCoordinates.push(getComputerChoicesY(size));
-    }
+    };
+    updateComputerChosenCoordinateArrayX(shipIndex)
 })
 function alerting() {
     if (shipCount === 5 && selectedShip === false) {
-        alert('yellow')
+        shipyardContainer.remove();
+
     }
 }
 rotateBtn.addEventListener('click', () => {
@@ -448,9 +480,12 @@ function hoverX() {
         for (let i = 0; i <= requiredCoordinates.length; i++) {
             let element = document.getElementById(requiredCoordinates[i]);
             if (element !== null) {
-                element.classList.add('hover2');
+                element.classList.add('hover');
             }
         }
+    }
+    else {
+        return;
     }
 }
 function removeHoverX() {
@@ -465,7 +500,7 @@ function removeHoverX() {
         let coordinate = setShipY(size, targetCoordinates);
         for (let i = 0; i <= coordinate.length - 1; i++) {
             let elem = document.getElementById(coordinate[i])
-            elem.classList.remove('hover2');
+            elem.classList.remove('hover');
         }
     }
 }
@@ -528,4 +563,67 @@ function getComputerChoicesY(size) {
     return chosenCoordinates;
 }
 
+startGameBtn.addEventListener('click', () => {
+    removeShipDesigns();
+    gameStarted = true
+    setCoordinates2()
 
+});
+function removeShipDesigns() {
+    let arr = playerChosenCoordinate;
+    for (let i = 0; i <= arr.length - 1; i++) {
+        let element = document.getElementById(arr[i]);
+        element.classList.remove('redShip', 'hover');
+    }
+}
+
+function swapGameBoard() {
+
+}
+let gameBox2 = document.querySelectorAll('.gameBox2');
+gameBox2.forEach(element => {
+    element.addEventListener('click', () => {
+        if (gameStarted === true) {
+            element.style.pointerEvents = 'none';
+            let arr = computerChosenCoordinate;
+            if (arr.includes(element.id)) element.classList.add('redShip');
+            else element.classList.add('blackShip');
+            computerPlay();
+        }
+    })
+});
+let availableChoiceArray = [];
+let pickedArr = [];
+
+function setCoordinates2() {
+    for (let i = 0; i <= gameBox2.length - 1; i++) {
+        let coordinate = coordinateGeneratorX();
+        gameBox2[i].setAttribute('id', coordinate[i]);
+        availableChoiceArray.push(coordinate[i]);
+    }
+}
+function computerPlay() {
+    let picked = ''
+    while (picked.length < 1){
+        let randomNumber = Math.floor(Math.random() * availableChoiceArray.length);
+        let humanChoice = playerChosenCoordinate;
+        let randomChoice = availableChoiceArray[randomNumber];
+        let element = gameBox[randomNumber];
+        if (pickedArr.includes(randomChoice)){
+            console.log('include');
+        }
+        else{
+            picked = randomChoice;
+            pickedArr.push(randomChoice);
+            if (humanChoice.includes(randomChoice)) {
+                element.classList.add('redShip');
+            }
+            else {
+                element.classList.add('blackShip');
+            }
+        }
+    }
+    // let randomChoiceIndex = availableChoiceArray.indexOf(randomChoice);
+    // availableChoiceArray.splice(randomChoiceIndex, 1);
+}
+// hiclogesic
