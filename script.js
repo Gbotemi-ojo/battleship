@@ -65,8 +65,8 @@ let selectCarrier = document.querySelector('.carrier');
 let gameBox = document.querySelectorAll('.gameBox');
 let rotateBtn = document.querySelector('.rotate');
 let hoverBoards = document.querySelectorAll('.hoverBoard');
-let exitBtn = document.querySelector('.exit');
-let infoCard = document.querySelector('.infoCard');
+// let exitBtn = document.querySelector('.exit');
+// let infoCard = document.querySelector('.infoCard');
 function disableClicksOnShips() {
     if (selectedShip === true) {
         selectCruiser.style.pointerEvents = 'none';
@@ -91,9 +91,9 @@ function enableClicksOnShips() {
         return
     }
 }
-exitBtn.addEventListener('click', () => {
-    infoCard.remove()
-})
+// exitBtn.addEventListener('click', () => {
+//     infoCard.remove()
+// })
 
 function coordinateGeneratorX() {
     let coordinateArray = [];
@@ -439,8 +439,9 @@ selectCarrier.addEventListener('click', () => {
 })
 function alerting() {
     if (shipCount === 5 && selectedShip === false) {
-        shipyardContainer.remove();
-
+        // shipyardContainer.remove();
+        startGameBtn.style.display = 'block'
+        rotateBtn.style.opacity = '0'
     }
 }
 rotateBtn.addEventListener('click', () => {
@@ -561,8 +562,8 @@ function getComputerChoicesY(size) {
 
 startGameBtn.addEventListener('click', () => {
     removeShipDesigns();
-    gameStarted = true
-    setCoordinates2()
+    gameStarted = true;
+    setCoordinates2();
 
 });
 function removeShipDesigns() {
