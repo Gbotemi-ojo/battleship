@@ -162,7 +162,6 @@ gameBox.forEach(element => {
             if (invalidPositionsArray.some(x => enteriesX.includes(x))) return;
             updateInvalidPositionArraay();
             updatePlayerChosenCoordinateArray();
-            // playerChosenCoordinate.push(setShipX(size, targetCoordinates));
             selectedShip = false;
             alerting();
             ships[shipIndex].takenCoordinates.push(setShipX(size, targetCoordinates));
@@ -432,7 +431,6 @@ selectCarrier.addEventListener('click', () => {
     selectCarrier.classList.add('reduce');
     if (currentAxis === 'X') {
         computerShips[4].takenCoordinates.push(getComputerChoicesX(size));
-        // updateComputerChosenCoordinateArrayX(shipIndex)
     }
     else {
         computerShips[4].takenCoordinates.push(getComputerChoicesY(size));
@@ -454,7 +452,6 @@ rotateBtn.addEventListener('click', () => {
     }
 })
 gameBox.forEach(element => {
-    // if (currentAxis === 'X') {
     element.addEventListener('mouseenter', () => {
         targetCoordinates = element.getAttribute('id');
         hoverX();
@@ -463,7 +460,6 @@ gameBox.forEach(element => {
         targetCoordinates = element.getAttribute('id');
         removeHoverX();
     })
-    // }
 });
 function hoverX() {
     if (currentAxis === 'X') {
@@ -603,16 +599,16 @@ function setCoordinates2() {
     }
 }
 function computerPlay() {
-    let picked = ''
-    while (picked.length < 1){
+    let picked = '';
+    while (picked.length < 1) {
         let randomNumber = Math.floor(Math.random() * availableChoiceArray.length);
         let humanChoice = playerChosenCoordinate;
         let randomChoice = availableChoiceArray[randomNumber];
         let element = gameBox[randomNumber];
-        if (pickedArr.includes(randomChoice)){
+        if (pickedArr.includes(randomChoice)) {
             console.log('include');
         }
-        else{
+        else {
             picked = randomChoice;
             pickedArr.push(randomChoice);
             if (humanChoice.includes(randomChoice)) {
@@ -623,7 +619,4 @@ function computerPlay() {
             }
         }
     }
-    // let randomChoiceIndex = availableChoiceArray.indexOf(randomChoice);
-    // availableChoiceArray.splice(randomChoiceIndex, 1);
 }
-// hiclogesic
