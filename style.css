@@ -56,18 +56,6 @@ body {
     cursor: pointer;
 }
 
-.gameBox:hover {
-    /* background-color: rgb(135, 206, 235); */
-    /* background-color: rgb(255, 0, 0, 0.5);; */
-    
-}
-
-
-
-/* .kkk {
-    writing-mode: vertical-lr;
-    text-orientation: upright;
-} */
 
 .shipyardContainer {
     display: flex;
@@ -113,27 +101,32 @@ body {
     color: white;
     letter-spacing: 4px;
 }
-.cruiser,.submarine,.destroyer,.battleship,.carrier{
+
+.cruiser,
+.submarine,
+.destroyer,
+.battleship,
+.carrier {
     cursor: pointer;
 }
-.designShip{
+
+.designShip {
     background-color: yellow;
 }
-.reduce{
+
+/* .reduce{
     opacity: 0;
     text-decoration: line-through;
     pointer-events: none;
-}
-.hover{
-    background-color: rgb(255, 0, 0,0.4);
+} */
+.hover {
+    background-color: rgb(255, 0, 0, 0.4);
 }
 
-.clickedCircle{
-    width: 60%;
-    height: 70%;
-    border-radius: 50%;
-    background-color: blue;
+.startGameBtn {
+    display: none;
 }
+
 /* .infoCard{
     position: absolute;
     width: 40%;
@@ -152,7 +145,8 @@ body {
     border-radius: 10px;
     box-shadow: 1px 1px 1px 1px green;
 } */
-.rotate ,.startGameBtn{
+.rotate,
+.startGameBtn {
     width: 50%;
     height: 45px;
     margin-left: 25%;
@@ -164,26 +158,97 @@ body {
     font-size: 22px;
     letter-spacing: 3px;
 }
-.startGameBtn{
+
+.reduce {
+    display: none;
+    pointer-events: none;
+}
+
+.playerShipyardContainer {
     display: none;
 }
-.redShip{
+
+.ComputerShipyardContainer {
+    opacity: 0;
+}
+
+
+.ComputerShipyardContainer>div:first-child,
+.playerShipyardContainer>div:first-child {
+    width: 50%;
+    height: 45px;
+    margin-left: 25%;
+    padding: 5px;
+    margin-top: 5px;
+    border: none;
+    border-radius: 10px;
+    font-size: 22px;
+    letter-spacing: 3px;
+    text-align: center;
+    text-decoration: underline;
+}
+
+
+.redShip {
     background-color: red;
 }
-.blackShip{
+
+.blackShip {
     background-color: black;
 }
-.shipyardContainer2{
-    opacity: 0;
+
+.computerShipsUpdate {
+    display: flex;
+
 }
-.invisible{
-    opacity: 0;
+
+.winnerStatus>div {
+    font-size: 30px;
+    font-weight: 900;
 }
- @media(max-width:800px){
-    .gameContainer{
+
+.winnerStatus {
+    position: absolute;
+    width: 50%;
+    height: 30%;
+    bottom: 50%;
+    left: 25%;
+    background-color: lightblue;
+    display: none;
+    flex-direction: column;
+    justify-content: space-around;
+    align-items: center;
+}
+
+.winnerStatus>button {
+    font-size: 20px;
+    width: 50%;
+    border-radius: 10px;
+    text-align: center;
+    height: 40px;
+    border: none;
+}
+
+.sunk {
+    opacity: 0.5;
+    text-decoration: line-through;
+    color: red;
+}
+
+.computerWon {
+    display: none;
+}
+
+.playerWon {
+    display: none;
+}
+
+@media(max-width:800px) {
+    .gameContainer {
         grid-template-columns: 1fr;
     }
-    .playerGameBoard{
+
+    .playerGameBoard {
         width: 98vw;
     }
- }
+}
