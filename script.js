@@ -1,21 +1,16 @@
 let shipyardContainer = document.querySelector('.shipyardContainer');
 let startGameBtn = document.querySelector('.startGameBtn');
 let gameStartedContainer = document.querySelector('.gameStartedContainer');
-let selectCruiser = document.querySelector('.cruiser');
-let selectSubmarine = document.querySelector('.submarine');
-let selectDestroyer = document.querySelector('.destroyer');
-let selectBattleship = document.querySelector('.battleship');
-let selectCarrier = document.querySelector('.carrier');
+let shipyard = document.querySelector('.shipyard');
+let selectShips = document.querySelectorAll('.selectShips');
 let gameBox = document.querySelectorAll('.gameBox');
 let rotateBtn = document.querySelector('.rotate');
 let hoverBoards = document.querySelectorAll('.hoverBoard');
 let gameBox2 = document.querySelectorAll('.gameBox2');
-
 let winnerStatus = document.querySelector('.winnerStatus');
 let playerWon = document.querySelector('.playerWon');
 let computerWon = document.querySelector('.computerWon');
 let playAgainBtn = document.querySelector('.playAgainBtn');
-
 let computerShipStatus = document.querySelectorAll('.computerShipStatus');
 let playerShipStatus = document.querySelectorAll('.playerShipStatus');
 let ComputerShipyardContainer = document.querySelector('.ComputerShipyardContainer');
@@ -293,7 +288,7 @@ class gameBoard {
             }
         }
     }
-    alerting() {
+    popStartGameBtn() {
         if (this.shipCount === 5 && this.selectedShip === false) {
             startGameBtn.style.display = 'block';
             rotateBtn.style.opacity = '0';
@@ -413,6 +408,7 @@ class gameBoard {
             let randomChoice = this.availableChoiceArray[randomNumber];
             let element = gameBox[randomNumber];
             if (this.pickedArr.includes(randomChoice)) {
+                picked = ''
             }
             else {
                 picked = randomChoice;
@@ -429,20 +425,10 @@ class gameBoard {
         }
     }
     fillShips() {
-        while (this.computerShips[4].takenCoordinates.length < 1) {
-            selectCarrier.click();
-        }
-        while (this.computerShips[3].takenCoordinates.length < 1) {
-            selectBattleship.click();
-        }
-        while (this.computerShips[2].takenCoordinates.length < 1) {
-            selectDestroyer.click();
-        }
-        while (this.computerShips[1].takenCoordinates.length < 1) {
-            selectSubmarine.click();
-        }
-        while (this.computerShips[0].takenCoordinates.length < 1) {
-            selectCruiser.click();
+        for (let i = 0; i <= 4; i++) {
+            while (this.computerShips[i].takenCoordinates.length < 1) {
+                selectShips[i].click()
+            }
         }
     }
     updateHitPlayer(value) {
@@ -516,26 +502,16 @@ function endGame() {
 }
 function disableClicksOnShips() {
     if (board.selectedShip === true) {
-        selectCruiser.style.pointerEvents = 'none';
-        selectSubmarine.style.pointerEvents = 'none';
-        selectDestroyer.style.pointerEvents = 'none';
-        selectBattleship.style.pointerEvents = 'none';
-        selectCarrier.style.pointerEvents = 'none';
-    }
-    else {
-        return
+        for (let i = 0; i <= 4; i++) {
+            selectShips[i].style.pointerEvents = 'none';
+        }
     }
 }
 function enableClicksOnShips() {
     if (board.selectedShip === false) {
-        selectCruiser.style.pointerEvents = 'all';
-        selectSubmarine.style.pointerEvents = 'all';
-        selectDestroyer.style.pointerEvents = 'all';
-        selectBattleship.style.pointerEvents = 'all';
-        selectCarrier.style.pointerEvents = 'all';
-    }
-    else {
-        return
+        for (let i = 0; i <= 4; i++) {
+            selectShips[i].style.pointerEvents = 'all';
+        }
     }
 }
 
@@ -549,7 +525,7 @@ gameBox.forEach(element => {
             board.updateInvalidPositionArraay();
             board.updatePlayerChosenCoordinateArray();
             board.selectedShip = false;
-            board.alerting();
+            board.popStartGameBtn();
             board.playerShips[board.shipIndex].takenCoordinates.push(board.setShipX(board.size, board.targetCoordinates));
             if (board.currentAxis === 'X') {
                 board.designShipX(board.size, board.targetCoordinates);
@@ -571,7 +547,7 @@ gameBox.forEach(element => {
             board.updateInvalidPositionArraay();
             board.updatePlayerChosenCoordinateArray();
             board.selectedShip = false;
-            board.alerting();
+            board.popStartGameBtn()
             board.playerShips[board.shipIndex].takenCoordinates.push(board.setShipY(board.size, board.targetCoordinates));
             if (board.currentAxis === 'Y') {
                 board.designShipY(board.size, board.targetCoordinates);
@@ -592,88 +568,33 @@ startGameBtn.addEventListener('click', () => {
     board.setCoordinates2();
     startGameBtn.remove();
     board.fillShips();
+    board.size = 0;
 });
-selectCruiser.addEventListener('click', () => {
-    board.selectedShip = true;
-    disableClicksOnShips();
-    board.selectedShip = true;
-    board.shipCount++;
-    board.size = 2;
-    board.shipIndex = 0;
-    selectCruiser.classList.add('reduce');
-    if (board.currentAxis === 'X') {
-        board.computerShips[0].takenCoordinates.push(board.getComputerChoicesX(board.size));
-    }
-    else {
-        board.computerShips[0].takenCoordinates.push(board.getComputerChoicesY(board.size));
-    }
-    board.updateComputerChosenCoordinateArrayX(board.shipIndex);
-})
-selectSubmarine.addEventListener('click', () => {
-    board.selectedShip = true;
-    disableClicksOnShips();
-    board.selectedShip = true;
-    board.shipCount++
-    board.size = 3;
-    board.shipIndex = 1
-    selectSubmarine.classList.add('reduce')
-    if (board.currentAxis === 'X') {
-        board.computerShips[1].takenCoordinates.push(board.getComputerChoicesX(board.size));
-    }
-    else {
-        board.computerShips[1].takenCoordinates.push(board.getComputerChoicesY(board.size));
-    }
-    board.updateComputerChosenCoordinateArrayX(board.shipIndex)
-})
-selectDestroyer.addEventListener('click', () => {
-    board.selectedShip = true;
-    disableClicksOnShips();
-    board.selectedShip = true;
-    board.size = 3;
-    board.shipIndex = 2;
-    board.shipCount++
-    selectDestroyer.classList.add('reduce')
-    if (board.currentAxis === 'X') {
-        board.computerShips[2].takenCoordinates.push(board.getComputerChoicesX(board.size));
-    }
-    else {
-        board.computerShips[2].takenCoordinates.push(board.getComputerChoicesY(board.size));
-    }
-    board.updateComputerChosenCoordinateArrayX(board.shipIndex)
-})
-
-selectBattleship.addEventListener('click', () => {
-    board.selectedShip = true;
-    disableClicksOnShips();
-    board.selectedShip = true;
-    board.size = 4;
-    board.shipIndex = 3
-    board.shipCount++
-    selectBattleship.classList.add('reduce')
-    if (board.currentAxis === 'X') {
-        board.computerShips[3].takenCoordinates.push(board.getComputerChoicesX(board.size));
-    }
-    else {
-        board.computerShips[3].takenCoordinates.push(board.getComputerChoicesY(board.size));
-    }
-    board.updateComputerChosenCoordinateArrayX(board.shipIndex);
-})
-selectCarrier.addEventListener('click', () => {
-    board.selectedShip = true;
-    disableClicksOnShips();
-    board.selectedShip = true;
-    board.size = 5;
-    board.shipIndex = 4;
-    board.shipCount++;
-    selectCarrier.classList.add('reduce');
-    if (board.currentAxis === 'X') {
-        board.computerShips[4].takenCoordinates.push(board.getComputerChoicesX(board.size));
-    }
-    else {
-        board.computerShips[4].takenCoordinates.push(board.getComputerChoicesY(board.size));
-    };
-    board.updateComputerChosenCoordinateArrayX(board.shipIndex);
-})
+let setShipSizes = (function () {
+    selectShips[0].size = 2
+    selectShips[1].size = 3
+    selectShips[2].size = 3
+    selectShips[3].size = 4
+    selectShips[4].size = 5
+})()
+selectShips.forEach(ship => {
+    ship.addEventListener('click', () => {
+        board.selectedShip = true;
+        disableClicksOnShips();
+        board.selectedShip = true;
+        board.shipCount++;
+        board.size = ship.size;
+        board.shipIndex = ship.id;
+        ship.classList.add('reduce');
+        if (board.currentAxis === 'X') {
+            board.computerShips[ship.id].takenCoordinates.push(board.getComputerChoicesX(board.size));
+        }
+        else {
+            board.computerShips[ship.id].takenCoordinates.push(board.getComputerChoicesY(board.size));
+        }
+        board.updateComputerChosenCoordinateArrayX(board.shipIndex);
+    })
+});
 rotateBtn.addEventListener('click', () => {
     if (board.currentAxis === 'X') {
         board.currentAxis = 'Y';
